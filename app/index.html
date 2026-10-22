@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Meu Bairro Conecta — Campus Facens</title>
+  <meta name="description" content="Plataforma colaborativa de mapeamento de ocorrências e sugestões de mobilidade no campus Facens." />
+  <meta name="theme-color" content="#0b5cab" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bairro Conecta" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="stylesheet" href="styles.css?v=5" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+      </span>
+      <div>
+        <strong>Meu Bairro Conecta</strong>
+        <small>Campus Facens · piloto</small>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="role-switch" role="group" aria-label="Perfil">
+        <button data-role="comunidade" class="active">Comunidade</button>
+        <button data-role="gestao">Gestão</button>
+      </div>
+      <button class="icon-btn" id="btn-alertas" aria-label="Alertas">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3a1.5 1.5 0 0 0-3 0v1.16A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>
+        <span class="badge" id="badge-alertas" hidden>0</span>
+      </button>
+      <button class="icon-btn" id="btn-ajuda" aria-label="Como funciona">?</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Painel lateral (desktop) / abas (mobile) -->
+    <aside class="side" id="side">
+      <section class="tab-panel" data-panel="lista">
+        <div class="panel-head">
+          <h2>Ocorrências e sugestões</h2>
+          <p class="muted" id="resumo-lista"></p>
+        </div>
+        <div class="filters">
+          <div class="seg" role="group" aria-label="Tipo">
+            <button data-tipo="todos" class="active">Todos</button>
+            <button data-tipo="problema">Problemas</button>
+            <button data-tipo="sugestao">Sugestões</button>
+          </div>
+          <div class="filter-row">
+            <select id="f-cat" aria-label="Categoria"><option value="">Todas as categorias</option></select>
+            <select id="f-status" aria-label="Status">
+              <option value="ativos">Ativas (pendente + análise)</option>
+              <option value="">Todos os status</option>
+              <option value="pendente">Pendente</option>
+              <option value="analise">Em análise</option>
+              <option value="resolvido">Resolvido</option>
+            </select>
+          </div>
+          <div class="filter-row">
+            <select id="f-raio" aria-label="Proximidade">
+              <option value="">Qualquer distância</option>
+              <option value="50">Até 50 m de mim</option>
+              <option value="100">Até 100 m de mim</option>
+              <option value="200">Até 200 m de mim</option>
+            </select>
+            <select id="f-ordem" aria-label="Ordenar">
+              <option value="confirmacoes">Mais confirmadas</option>
+              <option value="recentes">Mais recentes</option>
+              <option value="distancia">Mais próximas</option>
+            </select>
+          </div>
+        </div>
+        <ul class="cards" id="lista"></ul>
+      </section>
+
+      <section class="tab-panel" data-panel="painel" hidden>
+        <div class="panel-head">
+          <h2>Painel de status</h2>
+          <p class="muted">Situação atual das ocorrências do campus.</p>
+        </div>
+        <div class="kpis" id="kpis"></div>
+        <h3 class="sub">Por status</h3>
+        <div class="stack-bar" id="bar-status"></div>
+        <div class="legend" id="legend-status"></div>
+        <h3 class="sub">Por categoria (ativas)</h3>
+        <div class="bars" id="bars-cat"></div>
+        <h3 class="sub">Locais com mais recorrência</h3>
+        <ol class="rank" id="rank-locais"></ol>
+        <div class="gestao-only">
+          <h3 class="sub">Ferramentas da gestão</h3>
+          <div class="btn-row">
+            <button class="btn" id="btn-heat">Mapa de calor</button>
+            <button class="btn" id="btn-csv">Exportar CSV</button>
+            <button class="btn" id="btn-calibrar">Calibrar GPS aqui</button>
+            <button class="btn ghost" id="btn-limpar-calib">Limpar calibração</button>
+            <button class="btn ghost" id="btn-reset">Restaurar dados de demonstração</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="rota" hidden>
+        <div class="panel-head">
+          <h2>Minha rota no campus</h2>
+          <p class="muted">Escolha seu trajeto diário. Você recebe alertas de ocorrências ativas a até 40 m do caminho.</p>
+        </div>
+        <label class="field">Saindo de
+          <select id="r-origem"></select>
+        </label>
+        <label class="field">Indo para
+          <select id="r-destino"></select>
+        </label>
+        <div class="btn-row">
+          <button class="btn primary" id="btn-salvar-rota">Salvar rota</button>
+          <button class="btn ghost" id="btn-limpar-rota">Remover</button>
+        </div>
+        <div id="rota-info"></div>
+        <h3 class="sub">Minha localização</h3>
+        <p class="muted small">Ligue o GPS para acompanhar sua posição em tempo real no mapa e receber alertas ao se aproximar de um problema. Sem GPS, defina sua posição manualmente.</p>
+        <div class="btn-row">
+          <button class="btn primary" id="btn-gps-rota">Usar GPS em tempo real</button>
+          <button class="btn" id="btn-def-local">Definir no mapa</button>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="alertas" hidden>
+        <div class="panel-head">
+          <h2>Alertas</h2>
+          <p class="muted">Novidades perto de você ou da sua rota.</p>
+        </div>
+        <ul class="alerts" id="alertas"></ul>
+      </section>
+    </aside>
+
+    <!-- Mapa -->
+    <section class="map-wrap">
+      <div class="map-toolbar">
+        <div class="seg small" role="group" aria-label="Camadas">
+          <button id="tg-locais" class="active" aria-pressed="true">Locais</button>
+          <button id="tg-resolvidos" aria-pressed="false">Resolvidas</button>
+          <button id="tg-gps" aria-pressed="false">📍 GPS</button>
+        </div>
+        <div class="gps-status" id="gps-status" role="status" aria-live="polite" hidden></div>
+      </div>
+      <div class="map-viewport" id="viewport">
+        <div class="map-stage" id="stage">
+          <img src="assets/mapa-facens.webp" decoding="async" alt="Mapa ilustrado do campus Facens" draggable="false" id="map-img" />
+          <canvas id="heat" class="heat" width="800" height="459" hidden></canvas>
+          <svg class="route-layer" id="route-layer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+          <div class="layer" id="layer-locais"></div>
+          <div class="layer" id="layer-pins"></div>
+          <div class="layer" id="layer-me"></div>
+        </div>
+      </div>
+      <div class="zoom">
+        <button id="z-in" aria-label="Aproximar">+</button>
+        <button id="z-out" aria-label="Afastar">−</button>
+        <button id="z-fit" aria-label="Enquadrar">⤢</button>
+        <button id="z-me" aria-label="Minha localização em tempo real">◎</button>
+      </div>
+      <div class="mode-banner" id="mode-banner" hidden>
+        <span id="mode-text">Toque no mapa onde está o problema</span>
+        <button class="btn small" id="btn-aqui-gps" hidden>📍 Aqui (GPS)</button>
+        <button class="btn small" id="btn-cancel-mode">Cancelar</button>
+      </div>
+      <button class="fab" id="fab-add">
+        <span aria-hidden="true">+</span> Registrar
+      </button>
+    </section>
+  </main>
+
+  <!-- Navegação inferior (mobile) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button data-tab="mapa" class="active"><span>🗺️</span>Mapa</button>
+    <button data-tab="lista"><span>📋</span>Lista</button>
+    <button data-tab="painel"><span>📊</span>Painel</button>
+    <button data-tab="rota"><span>🧭</span>Rota</button>
+    <button data-tab="alertas"><span>🔔</span>Alertas</button>
+  </nav>
+  <!-- Abas (desktop) -->
+  <template id="tpl-side-tabs">
+    <div class="side-tabs">
+      <button data-tab="lista" class="active">Lista</button>
+      <button data-tab="painel">Painel</button>
+      <button data-tab="rota">Rota</button>
+      <button data-tab="alertas">Alertas</button>
+    </div>
+  </template>
+
+  <!-- Detalhe da ocorrência -->
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="d-titulo">
+      <button class="close" data-close aria-label="Fechar">×</button>
+      <div id="detalhe"></div>
+    </div>
+  </div>
+
+  <!-- Formulário de cadastro -->
+  <div class="sheet" id="form-sheet" hidden>
+    <form class="sheet-card" id="form" role="dialog" aria-modal="true" aria-labelledby="f-titulo-h">
+      <button type="button" class="close" data-close aria-label="Fechar">×</button>
+      <h2 id="f-titulo-h">Nova ocorrência</h2>
+      <p class="muted small" id="f-local"></p>
+      <div class="seg wide" role="group" aria-label="Tipo de registro">
+        <button type="button" data-ftipo="problema" class="active">⚠️ Problema</button>
+        <button type="button" data-ftipo="sugestao">💡 Sugestão de melhoria</button>
+      </div>
+      <fieldset class="cat-grid" id="f-cats"><legend>Categoria</legend></fieldset>
+      <label class="field">Título
+        <input id="f-titulo" required maxlength="80" placeholder="Ex.: Buraco perto da portaria" />
+      </label>
+      <label class="field">Descrição
+        <textarea id="f-desc" rows="3" maxlength="400" placeholder="O que está acontecendo? Desde quando? Em que horário piora?"></textarea>
+      </label>
+      <label class="field">Foto (opcional)
+        <input type="file" id="f-foto" accept="image/*" capture="environment" />
+      </label>
+      <img id="f-preview" class="preview" alt="" hidden />
+      <div id="f-duplicadas"></div>
+      <div class="btn-row end">
+        <button type="button" class="btn ghost" data-close>Cancelar</button>
+        <button type="submit" class="btn primary">Publicar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Onboarding -->
+  <div class="sheet" id="onboarding" hidden>
+    <div class="sheet-card onboarding" role="dialog" aria-modal="true" aria-labelledby="ob-title">
+      <div id="ob-step"></div>
+      <div class="ob-dots" id="ob-dots"></div>
+      <div class="btn-row end">
+        <button class="btn ghost" id="ob-skip">Pular</button>
+        <button class="btn primary" id="ob-next">Próximo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="data.js?v=5"></script>
+  <script src="native.js?v=5"></script>
+  <script src="app.js?v=5"></script>
+  <script>
+    // PWA: registra o service worker (no app nativo Capacitor ele é ignorado).
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http") && !window.Capacitor) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>

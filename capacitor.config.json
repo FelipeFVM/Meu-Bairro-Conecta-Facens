@@ -1,0 +1,13 @@
+{
+  "appId": "br.facens.meubairroconecta",
+  "appName": "Bairro Conecta",
+  "webDir": "app",
+  "backgroundColor": "#0b5cab",
+  "ios": { "contentInset": "never" },
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": { "launchAutoHide": false, "backgroundColor": "#0b5cab", "showSpinner": false },
+    "LocalNotifications": { "iconColor": "#0b5cab" },
+    "StatusBar": { "overlaysWebView": false }
+  }
+}

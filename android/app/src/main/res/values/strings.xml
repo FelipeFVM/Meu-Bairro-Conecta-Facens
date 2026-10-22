@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Bairro Conecta</string>
+    <string name="title_activity_main">Bairro Conecta</string>
+    <string name="package_name">br.facens.meubairroconecta</string>
+    <string name="custom_url_scheme">br.facens.meubairroconecta</string>
+</resources>

@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+ios/App/build/
+ios/DerivedData/
+.claude/settings.local.json
