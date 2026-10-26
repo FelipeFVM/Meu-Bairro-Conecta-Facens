@@ -11,3 +11,4 @@ ios/DerivedData/
 # Documentação acadêmica (contém dados do grupo) — não publicar
 docs/*.docx
 docs/gerar_documento.js
+docs/trello-cards.md
